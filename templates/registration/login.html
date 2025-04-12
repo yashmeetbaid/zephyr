@@ -1,0 +1,664 @@
+{% extends 'registration/registration_base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Zephyr Learning Management System - Login' %}{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<style>
+  body {
+    background-color: #0a0a14;
+    color: #ffffff;
+    margin: 0;
+    overflow-x: hidden;
+    position: relative;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    height: 100vh;
+  }
+
+  /* Animated Background Gradient */
+  .gradient-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+    background: linear-gradient(-45deg, #051937, #004d7a, #008793, #00bf72);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+  }
+
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Particle Container */
+  #particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+  }
+
+  /* Content Container */
+  .container-fluid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .main-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: rgba(15, 15, 30, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Info Panel */
+  .info-panel {
+    flex: 1.2;
+    background: linear-gradient(135deg, rgba(32, 44, 90, 0.8), rgba(10, 18, 40, 0.9));
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 70%, rgba(49, 140, 231, 0.1), transparent 50%);
+    z-index: -1;
+  }
+
+  .info-panel-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-logo {
+    width: 120px;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 8px rgba(78, 159, 255, 0.6));
+    animation: pulsate 3s infinite alternate;
+  }
+
+  @keyframes pulsate {
+    from { filter: drop-shadow(0 0 8px rgba(78, 159, 255, 0.4)); }
+    to { filter: drop-shadow(0 0 12px rgba(78, 159, 255, 0.8)); }
+  }
+
+  .info-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #ffffff, #4e9fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .info-text {
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 90%;
+    opacity: 0.85;
+  }
+
+  .info-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-top: 2rem;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #4e9fff;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: slideIn 0.5s forwards;
+  }
+
+  .feature-item:nth-child(1) {
+    animation-delay: 0.3s;
+  }
+
+  .feature-item:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+
+  .feature-item:nth-child(3) {
+    animation-delay: 0.7s;
+  }
+
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .feature-item:hover {
+    background-color: rgba(78, 159, 255, 0.1);
+    transform: translateX(5px);
+  }
+
+  .feature-icon {
+    margin-right: 1rem;
+    color: #4e9fff;
+    font-size: 1.5rem;
+  }
+
+  /* Login Panel */
+  .login-panel {
+    flex: 0.8;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .login-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, #4e9fff, #00d2ff);
+    border-radius: 3px;
+  }
+
+  .login-form {
+    margin-top: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.7rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #4e9fff;
+    box-shadow: 0 0 0 3px rgba(78, 159, 255, 0.25);
+    outline: none;
+  }
+
+  .input-icon {
+    position: absolute;
+    right: 12px;
+    top: 40px;
+    color: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus + .input-icon {
+    color: #4e9fff;
+  }
+
+  .error-message {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .error-message i {
+    margin-right: 0.5rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.6rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, #4e9fff, #00d2ff);
+    color: white;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .btn i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s;
+  }
+
+  .btn:hover::before {
+    left: 100%;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .buttons-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .flex-grow {
+    flex-grow: 1;
+  }
+
+  .login-bottom {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .login-bottom a {
+    color: #4e9fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .login-bottom a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: #4e9fff;
+    transition: width 0.3s ease;
+  }
+
+  .login-bottom a:hover {
+    color: #ffffff;
+  }
+
+  .login-bottom a:hover::after {
+    width: 100%;
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 992px) {
+    .main-container {
+      flex-direction: column;
+      max-width: 600px;
+    }
+    
+    .info-panel, .login-panel {
+      width: 100%;
+      padding: 2rem;
+    }
+    
+    .info-title {
+      font-size: 1.8rem;
+    }
+    
+    .info-text {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .buttons-group {
+      flex-direction: column;
+    }
+    
+    .info-panel, .login-panel {
+      padding: 1.5rem;
+    }
+  }
+
+  /* Floating elements */
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(78, 159, 255, 0.1);
+    animation: float 15s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  .float-1 {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .float-2 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    right: 15%;
+    animation-delay: 3s;
+  }
+
+  .float-3 {
+    width: 80px;
+    height: 80px;
+    bottom: 15%;
+    left: 20%;
+    animation-delay: 6s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+  }
+</style>
+
+<!-- Gradient Background -->
+<div class="gradient-background"></div>
+
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
+<div class="container-fluid">
+  <div class="main-container">
+    <!-- Info Panel -->
+    <div class="info-panel">
+      <div class="floating-element float-1"></div>
+      <div class="floating-element float-2"></div>
+      <div class="floating-element float-3"></div>
+      
+      <div class="info-panel-content">
+        <img src="/static/img/brand.svg" alt="LMS Logo" class="brand-logo">
+        <h1 class="info-title">Intelligent Learning Management System</h1>
+        <p class="info-text">Welcome to the new generation of learning experiences. Access courses, track progress, and connect with fellow learners in one intelligent platform.</p>
+        
+        <div class="info-features">
+          <div class="feature-item">
+            <i class="fas fa-brain feature-icon"></i>
+            <span>AI-driven personalized learning paths</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-shield-alt feature-icon"></i>
+            <span>Advanced security for your learning journey</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-puzzle-piece feature-icon"></i>
+            <span>Interactive quizzes and assessments</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Login Panel -->
+    <div class="login-panel">
+      <h2 class="login-title">{% trans 'Sign in to your account' %}</h2>
+      
+      <form action="" method="POST" id="login-form" class="login-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label for="username_id">{% trans 'ID Number' %}</label>
+          <input type="text" name="username" id="username_id" class="form-control" required>
+          <i class="fas fa-user input-icon"></i>
+        </div>
+        
+        <div class="form-group">
+          <label for="password_id">{% trans 'Password' %}</label>
+          <input type="password" name="password" id="password_id" class="form-control" required>
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        
+        {% if form.errors %}
+        <div class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>{% trans 'Invalid ID & Password.' %}</span>
+        </div>
+        {% endif %}
+        
+        <div class="buttons-group">
+          <button type="submit" class="btn btn-primary flex-grow" id="login-btn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>{% trans 'Sign In' %}</span>
+          </button>
+          <a href="{% url 'register' %}" class="btn btn-outline">
+            <i class="fas fa-user-plus"></i>
+            <span>{% trans 'Register' %}</span>
+          </a>
+        </div>
+        
+        <div class="login-bottom">
+          <a href="{% url 'admin:login' %}">{% trans 'Admin Login' %}</a>
+          <span class="mx-2">•</span>
+          <a href="{% url 'password_reset' %}">{% trans 'Forgot Password?' %}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/three@0.135.0/build/three.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Three.js scene for particles
+  const particleContainer = document.getElementById('particles-container');
+  
+  // Scene setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  particleContainer.appendChild(renderer.domElement);
+  
+  // Particles
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 300;
+  
+  const posArray = new Float32Array(particlesCount * 3);
+  const scaleArray = new Float32Array(particlesCount);
+  
+  // Fill with random positions
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    posArray[i] = (Math.random() - 0.5) * 15;
+    posArray[i+1] = (Math.random() - 0.5) * 15;
+    posArray[i+2] = (Math.random() - 0.5) * 10;
+    scaleArray[i/3] = Math.random();
+  }
+  
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+  particlesGeometry.setAttribute('scale', new THREE.BufferAttribute(scaleArray, 1));
+  
+  // Material
+  const particlesMaterial = new THREE.PointsMaterial({
+    size: 0.1,
+    color: 0x4e9fff,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true
+  });
+  
+  // Mesh
+  const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particlesMesh);
+  
+  // Position camera
+  camera.position.z = 5;
+  
+  // Mouse tracking
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetX = 0;
+  let targetY = 0;
+  
+  document.addEventListener('mousemove', (event) => {
+    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+  });
+  
+  // Animation loop
+  const clock = new THREE.Clock();
+  
+  const animate = () => {
+    requestAnimationFrame(animate);
+    
+    const elapsedTime = clock.getElapsedTime();
+    
+    // Smooth mouse following
+    targetX = mouseX * 0.2;
+    targetY = -mouseY * 0.2;
+    
+    particlesMesh.rotation.x += 0.001;
+    particlesMesh.rotation.y += 0.001;
+    
+    // Add smooth mouse interaction
+    particlesMesh.rotation.x += (targetY - particlesMesh.rotation.x) * 0.05;
+    particlesMesh.rotation.y += (targetX - particlesMesh.rotation.y) * 0.05;
+    
+    // Make particles move slightly
+    const positions = particlesGeometry.attributes.position.array;
+    const scales = particlesGeometry.attributes.scale.array;
+    
+    for (let i = 0; i < particlesCount; i++) {
+      const ix = i * 3;
+      positions[ix+1] += Math.sin(elapsedTime + scales[i]) * 0.005;
+      positions[ix] += Math.cos(elapsedTime + scales[i]) * 0.005;
+    }
+    
+    particlesGeometry.attributes.position.needsUpdate = true;
+    
+    renderer.render(scene, camera);
+  };
+  
+  animate();
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  
+  // Form animations
+  const formElements = document.querySelectorAll('.form-control');
+  formElements.forEach(el => {
+    el.addEventListener('focus', function() {
+      this.closest('.form-group').classList.add('active');
+    });
+    
+    el.addEventListener('blur', function() {
+      if (this.value === '') {
+        this.closest('.form-group').classList.remove('active');
+      }
+    });
+  });
+  
+  // Add input animations
+  const inputs = document.querySelectorAll('.form-control');
+  inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+      input.parentElement.querySelector('label').style.color = '#4e9fff';
+    });
+    
+    input.addEventListener('blur', () => {
+      input.parentElement.querySelector('label').style.color = 'rgba(255, 255, 255, 0.8)';
+    });
+  });
+  
+  // Button hover effects
+  const buttons = document.querySelectorAll('.btn');
+  buttons.forEach(button => {
+    button.addEventListener('mouseover', () => {
+      button.style.transform = 'translateY(-2px)';
+    });
+    
+    button.addEventListener('mouseout', () => {
+      button.style.transform = 'translateY(0)';
+    });
+  });
+});
+</script>
+{% endblock %}

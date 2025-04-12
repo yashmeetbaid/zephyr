@@ -1,0 +1,659 @@
+{% extends 'registration/registration_base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Register | Learning management system' %}{% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+  body {
+    background-color: #0a0a14;
+    color: #ffffff;
+    margin: 0;
+    overflow-x: hidden;
+    position: relative;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Animated Background Gradient */
+  .gradient-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+    background: linear-gradient(-45deg, #051937, #004d7a, #008793, #00bf72);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+  }
+
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Particle Container */
+  #particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+  }
+
+  /* Main Container */
+  .container {
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 0.8s ease-out;
+    max-width: 1140px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header */
+  .register-header {
+    background: linear-gradient(135deg, #4e9fff, #00d2ff);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(0px);
+    transition: transform 0.3s ease;
+  }
+
+  .register-header:hover {
+    transform: translateY(-5px);
+  }
+
+  .register-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+  }
+
+  .register-header i {
+    margin-right: 1rem;
+    font-size: 1.5rem;
+  }
+
+  /* Form Container */
+  .form-container {
+    background-color: rgba(15, 15, 30, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Section Headers */
+  .section-header {
+    background: linear-gradient(90deg, rgba(78, 159, 255, 0.15), transparent);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #4e9fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  /* Form Controls */
+  .form-label {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: block;
+    transition: color 0.3s ease;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #4e9fff;
+    box-shadow: 0 0 0 3px rgba(78, 159, 255, 0.25);
+    outline: none;
+  }
+
+  .form-control:focus + .form-label {
+    color: #4e9fff;
+  }
+
+  .form-field {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Form rows styling */
+  .row {
+    margin-bottom: 1rem;
+  }
+
+  /* Button styling */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.6rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, #4e9fff, #00d2ff);
+    color: white;
+  }
+
+  .btn i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s;
+  }
+
+  .btn:hover::before {
+    left: 100%;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Links */
+  a.link {
+    color: #4e9fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    font-weight: 500;
+  }
+
+  a.link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: #4e9fff;
+    transition: width 0.3s ease;
+  }
+
+  a.link:hover {
+    color: #ffffff;
+  }
+
+  a.link:hover::after {
+    width: 100%;
+  }
+
+  /* Messages */
+  .message-success {
+    color: #00d0a1;
+    background-color: rgba(0, 208, 161, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: inline-block;
+    animation: fadeInUp 0.5s ease;
+  }
+
+  .message-error {
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: inline-block;
+    animation: fadeInUp 0.5s ease;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Error messages */
+  .text-danger {
+    color: #ff6b6b;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .text-danger i {
+    margin-right: 0.5rem;
+  }
+
+  .text-success {
+    color: #00d0a1;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  /* Bottom link container */
+  .bottom-link-container {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Responsive styles */
+  @media (max-width: 992px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 1.5rem;
+    }
+    
+    .register-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Floating elements */
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(78, 159, 255, 0.1);
+    animation: float 15s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  .float-1 {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .float-2 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    right: 15%;
+    animation-delay: 3s;
+  }
+
+  .float-3 {
+    width: 80px;
+    height: 80px;
+    bottom: 15%;
+    left: 20%;
+    animation-delay: 6s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+  }
+
+  /* Custom select styling */
+  select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+  }
+
+  /* Form control focus effect */
+  .form-control-wrapper {
+    position: relative;
+  }
+
+  .form-control-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4e9fff, #00d2ff);
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+
+  .form-control-wrapper:focus-within::after {
+    width: 100%;
+    left: 0;
+  }
+  
+  /* Input error styling */
+  .is-invalid {
+    border-color: #ff6b6b !important;
+  }
+  
+  .is-valid {
+    border-color: #00d0a1 !important;
+  }
+  
+  .bg-error {
+    background-color: rgba(255, 107, 107, 0.1);
+    border-radius: 4px;
+  }
+  
+  .bg-correct {
+    background-color: rgba(0, 208, 161, 0.1);
+    border-radius: 4px;
+  }
+</style>
+
+<!-- Gradient Background -->
+<div class="gradient-background"></div>
+
+<!-- Particles Container -->
+<div id="particles-container"></div>
+
+<div class="container py-5">
+  <div class="floating-element float-1"></div>
+  <div class="floating-element float-2"></div>
+  <div class="floating-element float-3"></div>
+  
+  <div class="register-header">
+    <h1>
+      <i class="fas fa-user-plus"></i>{% trans 'Create Your Account' %}
+    </h1>
+  </div>
+
+  <div class="form-container">
+    <form action="" method="POST" id="login-form">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="section-header">{% trans 'Login Information' %}</div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="username_id" class="form-label">{{ form.username.label }}</label>
+            {{ form.username }}
+            <div id="message-wrapper"></div>
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="email_id" class="form-label">{{ form.email.label }}</label>
+            {{ form.email }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="password1_id" class="form-label">{{ form.password1.label }}</label>
+            {{ form.password1 }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="password2_id" class="form-label">{{ form.password2.label }}</label>
+            {{ form.password2 }}
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="section-header">{% trans 'Personal Information' %}</div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="address_id" class="form-label">{{ form.address.label }}</label>
+            {{ form.address }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="phone_id" class="form-label">{{ form.phone.label }}</label>
+            {{ form.phone }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="first_name_id" class="form-label">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="last_name_id" class="form-label">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="gender_id" class="form-label">{{ form.gender.label }}</label>
+            {{ form.gender }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="level_id" class="form-label">{{ form.level.label }}</label>
+            {{ form.level }}
+          </div>
+          <div class="mb-3 form-control-wrapper">
+            <label for="program_id" class="form-label">{{ form.program.label }}</label>
+            {{ form.program }}
+          </div>
+        </div>
+      </div>
+
+      {% if form.errors %}
+        <p class="text-danger my-2"><i class="fas fa-exclamation-circle"></i>{% trans 'Invalid ID & Password.' %}</p>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary" id="login-btn">
+        <i class="fas fa-user-plus"></i><span>{% trans 'SIGN UP' %}</span>
+      </button>
+    </form>
+  </div>
+  
+  <div class="bottom-link-container">
+    <span>{% trans 'Already Registered?' %}</span>
+    <a href="{% url 'login' %}" class="link">{% trans 'Login' %}</a>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/three@0.135.0/build/three.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Three.js scene for particles
+  const particleContainer = document.getElementById('particles-container');
+  
+  // Scene setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  particleContainer.appendChild(renderer.domElement);
+  
+  // Particles
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 300;
+  
+  const posArray = new Float32Array(particlesCount * 3);
+  const scaleArray = new Float32Array(particlesCount);
+  
+  // Fill with random positions
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    posArray[i] = (Math.random() - 0.5) * 15;
+    posArray[i+1] = (Math.random() - 0.5) * 15;
+    posArray[i+2] = (Math.random() - 0.5) * 10;
+    scaleArray[i/3] = Math.random();
+  }
+  
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+  particlesGeometry.setAttribute('scale', new THREE.BufferAttribute(scaleArray, 1));
+  
+  // Material
+  const particlesMaterial = new THREE.PointsMaterial({
+    size: 0.1,
+    color: 0x4e9fff,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true
+  });
+  
+  // Mesh
+  const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particlesMesh);
+  
+  // Position camera
+  camera.position.z = 5;
+  
+  // Mouse tracking
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetX = 0;
+  let targetY = 0;
+  
+  document.addEventListener('mousemove', (event) => {
+    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+  });
+  
+  // Animation loop
+  const clock = new THREE.Clock();
+  
+  const animate = () => {
+    requestAnimationFrame(animate);
+    
+    const elapsedTime = clock.getElapsedTime();
+    
+    // Smooth mouse following
+    targetX = mouseX * 0.2;
+    targetY = -mouseY * 0.2;
+    
+    particlesMesh.rotation.x += 0.001;
+    particlesMesh.rotation.y += 0.001;
+    
+    // Add smooth mouse interaction
+    particlesMesh.rotation.x += (targetY - particlesMesh.rotation.x) * 0.05;
+    particlesMesh.rotation.y += (targetX - particlesMesh.rotation.y) * 0.05;
+    
+    // Make particles move slightly
+    const positions = particlesGeometry.attributes.position.array;
+    const scales = particlesGeometry.attributes.scale.array;
+    
+    for (let i = 0; i < particlesCount; i++) {
+      const ix = i * 3;
+      positions[ix+1] += Math.sin(elapsedTime + scales[i]) * 0.005;
+      positions[ix] += Math.cos(elapsedTime + scales[i]) * 0.005;
+    }
+    
+    particlesGeometry.attributes.position.needsUpdate = true;
+    
+    renderer.render(scene, camera);
+  };
+  
+  animate();
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  
+  // Original functionality
+  const loginFormEl = document.getElementById('login-form');
+  const loginBtnEl = document.getElementById('login-btn');
+
+  loginFormEl.addEventListener('submit', () => {
+    loginBtnEl.innerHTML = '<i class="fas fa-user-plus"></i> <span>Signing you up . . .</span>';
+    loginBtnEl.classList.add("disabled");
+  });
+
+  // Enhance form controls with animation effects
+  const formControls = document.querySelectorAll('.form-control');
+  formControls.forEach(control => {
+    // Add focus/blur effects
+    control.addEventListener('focus', function() {
+      this.closest('.form-control-wrapper').classList.add('focused');
+    });
+    
+    control.addEventListener('blur', function() {
+      if (this.value === '') {
+        this.closest('.form-control-wrapper').classList.remove('focused');
+      }
+    });
+    
+    // Add initial class if field has value
+    if (control.value !== '') {
+      control.closest('.form-control-wrapper').classList.add('has-value');
+    }
+  });
+
+  // Username validation - preserved from original
+  $("#username_id").on("input", function () {
+    username = $(this).val();
+
+    $.ajax({
+      url: "/accounts/ajax/validate-username/",
+      data: {
+        username: username
+      },
+      dataType: 'json',
+      success: function (data) {
+        if (data.is_taken) {
+          console.log(data.is_taken);
+          $('#message-wrapper').html(`<p class="my-2 text-danger"><span class="bg-error p-2"><b>${username}</b> already taken :( try another one </span></p>`);
+          $('#username_id').addClass('is-invalid').removeClass('is-valid');
+        }
+        else {
+          $('#message-wrapper').html(`<p class="my-2 text-success"><span class="bg-correct p-2"><b>${username}</b> is valid </span></p>`);
+          $('#username_id').addClass('is-valid').removeClass('is-invalid');
+        }
+      }
+    });
+  });
+  
+  // Animate section headers on page load
+  const sectionHeaders = document.querySelectorAll('.section-header');
+  sectionHeaders.forEach((header, index) => {
+    header.style.opacity = '0';
+    header.style.transform = 'translateX(-20px)';
+    
+    setTimeout(() => {
+      header.style.transition = 'all 0.5s ease';
+      header.style.opacity = '1';
+      header.style.transform = 'translateX(0)';
+    }, 300 + (index * 200));
+  });
+});
+</script>
+{% endblock %}

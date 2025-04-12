@@ -1,0 +1,625 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %} {% trans 'Dashboard' %} | {% trans 'Learning management system' %} {% endblock title %}
+{% load static %}
+
+{% block header %}
+<!-- Custom CSS for the black, white, and blue theme -->
+<style>
+  :root {
+    --primary-blue: #1e88e5;
+    --dark-blue: #0d47a1;
+    --light-blue: #64b5f6;
+    --lighter-blue: #bbdefb;
+    --dark: #212121;
+    --gray: #757575;
+    --light-gray: #f5f5f5;
+    --white: #ffffff;
+  }
+  
+  body {
+    background-color: #f0f4f8;
+    color: var(--dark);
+  }
+  
+  .breadcrumb {
+    background-color: var(--white);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .breadcrumb-item a {
+    color: var(--primary-blue);
+  }
+  
+  .title-1 {
+    color: var(--dark-blue);
+    font-weight: 600;
+  }
+  
+  .btn-light {
+    background-color: var(--white);
+    border: 1px solid var(--lighter-blue);
+    color: var(--dark);
+  }
+  
+  .btn-light:hover {
+    background-color: var(--lighter-blue);
+  }
+  
+  .card-count {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card-count:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .card-count .text-right {
+    color: var(--dark);
+  }
+  
+  .card-count h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+  }
+  
+  .card-count i {
+    color: var(--white);
+    padding: 10px;
+    border-radius: 50%;
+  }
+  
+  .bg-light-aqua {
+    background-color: var(--light-blue) !important;
+  }
+  
+  .bg-light-orange {
+    background-color: var(--primary-blue) !important;
+  }
+  
+  .bg-light-red {
+    background-color: var(--dark-blue) !important;
+  }
+  
+  .bg-light-purple {
+    background-color: var(--light-blue) !important;
+  }
+  
+  .chart-wrap {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    height: 100%;
+    position: relative;
+  }
+  
+  .chart-wrap .fa-expand-alt {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--gray);
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  .chart-wrap .fa-expand-alt:hover {
+    color: var(--primary-blue);
+  }
+  
+  .col-md-6.expand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.95);
+  }
+  
+  .col-md-6.expand .chart-wrap {
+    height: 90vh;
+  }
+  
+  .bg-white {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  h5 {
+    color: var(--dark-blue);
+    font-weight: 600;
+  }
+  
+  .dropdown-menu {
+    background-color: var(--white);
+    border: 1px solid var(--lighter-blue);
+  }
+  
+  .dropdown-header {
+    color: var(--dark-blue);
+    font-weight: 600;
+  }
+  
+  .dropdown-item.active {
+    background-color: var(--primary-blue);
+    color: var(--white);
+  }
+  
+  .dropdown-item:hover {
+    background-color: var(--lighter-blue);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{% trans 'Dashboard' %}</li>
+    </ol>
+</nav>
+
+{% include 'snippets/messages.html' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<h1 class="title-1">{% trans 'Dashboard' %}</h1>
+	<div class="dropdown">
+		<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown"
+			aria-expanded="false">
+			<i class="fas fa-cog"></i>
+		</button>
+		<div class="dropdown-menu">
+			<h6 class="dropdown-header">{% trans 'Dashboard settings' %}</h6>
+			<button class="dropdown-item active" type="button">{% trans 'Display grid' %}</button>
+			<button class="dropdown-item" type="button">{% trans 'Display table' %}</button>
+			<hr>
+			<button class="dropdown-item" type="button">{% trans 'Manage dashboard' %}</button>
+		</div>
+	</div>
+</div>
+
+<div class="row users-count px-3">
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-aqua"></i></h3>
+			<div class="text-right">
+				{% trans 'Students' %}
+				<h2>{{ student_count }}</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-orange"></i></h3>
+			<div class="text-right">
+				{% trans 'Lecturers' %}
+				<h2>{{ lecturer_count }}</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-red"></i></h3>
+			<div class="text-right">
+				{% trans 'Administrators' %}
+				<h2>{{ superuser_count }}</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-purple"></i></h3>
+			<div class="text-right">
+				{% trans 'Lab Assistance' %}
+				<h2>500</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-red"></i></h3>
+			<div class="text-right">
+				{% trans 'Librarians' %}
+				<h2>300</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-purple"></i></h3>
+			<div class="text-right">
+				{% trans 'Supervisors' %}
+				<h2>660</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-orange"></i></h3>
+			<div class="text-right pl-2">
+				{% trans 'Office Assistance' %}
+				<h2>1,700</h2>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-md-3 mb-3 px-2">
+		<div class="card-count p-3">
+			<h3><i class="fas fa-users bg-light-aqua"></i></h3>
+			<div class="text-right">
+				{% trans 'Others' %}
+				<h2>1,250</h2>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row px-2">
+	<div class="col-md-6 p-2">
+		<div class="chart-wrap">
+			<i class="fas fa-expand-alt"></i>
+			<canvas id="traffic"></canvas>
+		</div>
+	</div>
+	<div class="col-md-6 p-2">
+		<div class="chart-wrap">
+			<i class="fas fa-expand-alt"></i>
+			<canvas id="enrollement"></canvas>
+		</div>
+	</div>
+	<div class="col-md-6 p-2">
+		<div class="chart-wrap">
+			<i class="fas fa-expand-alt"></i>
+			<canvas id="students_grade"></canvas>
+		</div>
+	</div>
+	<div class="col-md-6 p-2">
+		<div class="card w-100 h-100 p-3">
+			<h5>{% trans 'Latest activities' %}</h5>
+			<ul class="ps-2 small">
+				{% for log in logs %}
+				<li>{{ log.message }} <span class="text-muted">- {{ log.created_at }}</span></li>
+				{% empty %}
+				<li>{% trans 'No recent activity' %}</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+<br>
+<div class="bg-white p-3">
+	<h5 class="border-bottom pb-2">{% trans 'School Demographics' %}</h5>
+	<div class="row">
+		<div class="col-md-4">
+			<i class="fas fa-expand-alt"></i>
+			<canvas id="gender"></canvas>
+		</div>
+		<div class="col-md-4">
+			<i class="fas fa-expand-alt"></i>
+			<canvas id="ethnicity"></canvas>
+		</div>
+		<div class="col-md-4">
+			<i class="fas fa-expand-alt"></i>
+			<canvas id="language"></canvas>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script>
+	$('.fa-expand-alt').click(function () {
+		if ($(this).parent('.chart-wrap').parent('.col-md-6').hasClass('expand')) {
+			$('.col-md-6.expand').removeClass('expand');
+		}
+		else {
+			$('.col-md-6.expand')?.removeClass('expand');
+			$(this).parent('.chart-wrap').parent('.col-md-6').addClass('expand');
+		}
+	})
+</script>
+<script>
+	const malesCount = {{ males_count }}
+    const femalesCount = {{ females_count }}
+
+    $(document).ready(function () {
+        // Blue color palette for charts
+        const blueColors = [
+            'rgba(13, 71, 161, 0.7)',  // Dark blue
+            'rgba(30, 136, 229, 0.7)',  // Primary blue
+            'rgba(100, 181, 246, 0.7)', // Light blue
+            'rgba(187, 222, 251, 0.7)', // Lighter blue
+            'rgba(33, 33, 33, 0.7)',    // Dark (almost black)
+            'rgba(117, 117, 117, 0.7)'  // Gray
+        ];
+
+        const blueBorders = [
+            'rgb(13, 71, 161)',  // Dark blue
+            'rgb(30, 136, 229)',  // Primary blue
+            'rgb(100, 181, 246)', // Light blue
+            'rgb(187, 222, 251)', // Lighter blue
+            'rgb(33, 33, 33)',    // Dark (almost black)
+            'rgb(117, 117, 117)'  // Gray
+        ];
+
+        // Setup
+        const labels = [
+            gettext('January'),
+            gettext('February'),
+            gettext('March'),
+            gettext('April'),
+            gettext('May'),
+            gettext('June'),
+        ];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: gettext('Students'),
+                backgroundColor: blueColors[0],
+                borderColor: blueBorders[0],
+                hoverBorderWidth: 3,
+                data: [0, 10, 5, 2, 20, 30, 45]
+            }, {
+                label: gettext('Teachers'),
+                backgroundColor: blueColors[1],
+                borderColor: blueBorders[1],
+                hoverBorderWidth: 3,
+                data: [20, 0, 15, 4, 6, 4, 60],
+            }, {
+                label: gettext('Admins'),
+                backgroundColor: blueColors[2],
+                borderColor: blueBorders[2],
+                hoverBorderWidth: 3,
+                data: [85, 30, 34, 20, 20, 55, 45],
+            }, {
+                label: gettext('Stuffs'),
+                backgroundColor: blueColors[3],
+                borderColor: blueBorders[3],
+                hoverBorderWidth: 3,
+                data: [45, 75, 70, 80, 20, 30, 90],
+            }]
+        };
+
+        var traffic = document.getElementById('traffic');
+        var chart = new Chart(traffic, {
+            type: 'line',
+            data: data,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: gettext('Website Traffic'),
+                        padding: 15,
+                        color: '#0d47a1'
+                    }
+                }
+            }
+        });
+
+        // Setup
+        const labelsEnrollment = [
+            '2016',
+            '2017',
+            '2018',
+            '2019',
+            '2020',
+            '2021',
+        ];
+        const dataEnrollment = {
+            labels: labelsEnrollment,
+            datasets: [{
+                label: gettext('Comp.S'),
+                backgroundColor: blueColors[0],
+                borderColor: blueBorders[0],
+                hoverBorderWidth: 3,
+                data: [0, 10, 5, 2, 20, 30, 45]
+            }, {
+                label: gettext('Architecture'),
+                backgroundColor: blueColors[1],
+                borderColor: blueBorders[1],
+                hoverBorderWidth: 3,
+                data: [20, 0, 15, 4, 6, 4, 60],
+            }, {
+                label: gettext('Civil Eng'),
+                backgroundColor: blueColors[2],
+                borderColor: blueBorders[2],
+                hoverBorderWidth: 3,
+                data: [85, 30, 34, 20, 20, 55, 45],
+            }, {
+                label: gettext('Accounting'),
+                backgroundColor: blueColors[3],
+                borderColor: blueBorders[3],
+                hoverBorderWidth: 3,
+                data: [45, 75, 70, 80, 20, 30, 90],
+            }, {
+                label: gettext('Business M.'),
+                backgroundColor: blueColors[4],
+                borderColor: blueBorders[4],
+                hoverBorderWidth: 3,
+                data: [15, 75, 45, 90, 60, 30, 90],
+            }]
+        };
+
+        var enrollement = document.getElementById('enrollement');
+        var chart = new Chart(enrollement, {
+            type: 'bar',
+            data: dataEnrollment,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: gettext('Enrollment per course'),
+                        padding: 20,
+                        color: '#0d47a1'
+                    }
+                }
+            }
+        });
+
+        // Average grade setup
+        const labelsGrade = [
+            '2017',
+            '2018',
+            '2019',
+            '2020',
+            '2022',
+        ];
+        const dataGrade = {
+            labels: labelsGrade,
+            datasets: [{
+                label: gettext("Comp sci."),
+                backgroundColor: blueColors[0],
+                borderColor: blueBorders[0],
+                hoverBorderWidth: 3,
+                data: [0, 10, 5, 2, 20, 30, 45]
+            }, {
+                label: gettext("Civil eng."),
+                backgroundColor: blueColors[1],
+                borderColor: blueBorders[1],
+                hoverBorderWidth: 3,
+                data: [20, 0, 15, 4, 6, 4, 60],
+            }, {
+                label: gettext("Architect."),
+                backgroundColor: blueColors[2],
+                borderColor: blueBorders[2],
+                hoverBorderWidth: 3,
+                data: [85, 30, 34, 20, 20, 55, 45],
+            }, {
+                label: gettext("Economics"),
+                backgroundColor: blueColors[3],
+                borderColor: blueBorders[3],
+                hoverBorderWidth: 3,
+                data: [45, 75, 70, 80, 20, 30, 90],
+            }]
+        };
+        
+        var students_grade = document.getElementById('students_grade');
+        var chart = new Chart(students_grade, {
+            type: 'bar',
+            data: dataGrade,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: gettext('Students average grade (performance)'),
+                        padding: 20,
+                        color: '#0d47a1'
+                    }
+                }
+            }
+        });
+
+        const dataGender = {
+            labels: [
+                gettext('Man'),
+                gettext('Women')
+            ],
+            datasets: [{
+                label: gettext("Students Gender Dataset"),
+                data: [malesCount, femalesCount],
+                backgroundColor: [
+                blueColors[0],
+                blueColors[2]
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        var gender = document.getElementById('gender');
+        var chart = new Chart(gender, {
+            type: 'pie',
+            data: dataGender,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: gettext('Students Gender'),
+                        padding: 20,
+                        color: '#0d47a1'
+                    }
+                }
+            }
+        });
+
+        const dataQualification = {
+            labels: [
+                gettext('PHD'),
+                gettext('Masters'),
+                gettext('BSc degree')
+            ],
+            datasets: [{
+                label: gettext("Lecturer Qualifications Dataset"),
+                data: [24, 30, 26],
+                backgroundColor: [
+                blueColors[0],
+                blueColors[1],
+                blueColors[2]
+                ],
+                hoverOffset: 4
+            }]
+        };
+        var ethnicity = document.getElementById('ethnicity');
+        var chart = new Chart(ethnicity, {
+            type: 'pie',
+            data: dataQualification,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: gettext('Lecturer qualifications'),
+                        padding: 20,
+                        color: '#0d47a1'
+                    }
+                }
+            }
+        });
+
+        const dataLevels = {
+            labels: [
+                gettext('PHD'),
+                gettext('Masters'),
+                gettext('BSc degree')
+            ],
+            datasets: [{
+                label: gettext("Students level"),
+                data: [14, 30, 56],
+                backgroundColor: [
+                blueColors[0],
+                blueColors[1],
+                blueColors[2]
+                ],
+                hoverOffset: 4
+            }]
+        };
+        var language = document.getElementById('language');
+        var chart = new Chart(language, {
+            type: 'pie',
+            data: dataLevels,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: gettext('Student levels'),
+                        padding: 20,
+                        color: '#0d47a1'
+                    }
+                }
+            }
+        });
+    })
+</script>
+
+{% endblock %}
